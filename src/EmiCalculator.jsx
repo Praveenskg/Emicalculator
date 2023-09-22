@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Container, Form, Row, Col, Button, Table } from "react-bootstrap";
 import { NumericFormat } from "react-number-format";
+import { Container, Form, Row, Col, Button, Table } from "react-bootstrap";
 
 const EMICalculator = () => {
   const [principal, setPrincipal] = useState(0);
@@ -78,13 +78,10 @@ const EMICalculator = () => {
 
   return (
     <>
-      <h2
-        className="mb-4 text-center text-white"
-        style={{ background: " #333" }}
-      >
-        EMI Calculator
+      <h2 className="mb-4 text-center text-white ">
+        <img src="https://images.cooltext.com/5672866.png" alt="" srcSet="" />
       </h2>
-      <Container className="py-4 border my-3 border-5 rounded">
+      <Container className="py-4 border my-3 border-5 rounded-3">
         <Form onSubmit={handleSubmit}>
           <Row>
             <Col sm={6}>
@@ -139,7 +136,7 @@ const EMICalculator = () => {
             </Col>
             <Col sm={6}>
               <Form.Group controlId="gstPercentage">
-                <Form.Label className="fw-bold">GST Percentage</Form.Label>
+                <Form.Label className="fw-bold mt-2">GST Percentage</Form.Label>
                 <NumericFormat
                   className="form-control"
                   suffix={"%"}
@@ -173,10 +170,10 @@ const EMICalculator = () => {
                 {totalPayment.toFixed(2)}
               </h5>
 
-              <h3 className="mb-4 text-center bg-secondary text-white">
+              <h3 className="mb-1 text-center bg-secondary text-white">
                 Amortization Schedule
               </h3>
-              <Table striped responsive bordered hover className="mt-4">
+              <Table striped responsive bordered hover className="mt-2">
                 <thead>
                   <tr>
                     <th>Month</th>
@@ -213,7 +210,7 @@ const EMICalculator = () => {
         >
           &copy; {new Date().getFullYear()} Made By:{" "}
           <a
-            className="text-dark text-decoration-none font-weight-bold"
+            className="text-decoration-none font-weight-bold"
             href="https://github.com/Praveenskg"
           >
             Praveen Singh
