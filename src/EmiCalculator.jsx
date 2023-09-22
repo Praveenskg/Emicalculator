@@ -79,7 +79,7 @@ const EMICalculator = () => {
   return (
     <>
       <h2 className="mb-4 text-center text-white ">
-        <img src="https://images.cooltext.com/5672866.png" alt="" srcSet="" />
+        <img src="./public/logo.png" alt="EMI Cal Logo"  />
       </h2>
       <Container className="py-4 border my-3 border-5 rounded-3">
         <Form onSubmit={handleSubmit}>
