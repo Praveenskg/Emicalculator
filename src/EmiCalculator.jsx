@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Form, Row, Col, Button, Table } from "react-bootstrap";
 import { NumericFormat } from "react-number-format";
 
@@ -9,7 +9,14 @@ const EMICalculator = () => {
   const [emi, setEMI] = useState(0);
   const [totalInterestPayable, setTotalInterestPayable] = useState(0);
   const [totalPayment, setTotalPayment] = useState(0);
-  const [amortizationSchedule, setAmortizationSchedule] = useState([]);
+  const [amortization, setAmortization] = useState([]);
+  const [amortizationWithGST, setAmortizationWithGST] = useState([]);
+  const [gstPercentage, setGstPercentage] = useState(18);
+  const [gstAmount, setGstAmount] = useState(0);
+
+  useEffect(() => {
+    calculateGST();
+  }, [totalInterestPayable, gstPercentage]);
 
   const calculateEMI = () => {
     const P = parseFloat(principal);
@@ -18,7 +25,8 @@ const EMICalculator = () => {
 
     const E = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
     const totalInterest = parseFloat((E * n - P).toFixed(2));
-    const totalAmt = parseFloat((E * n).toFixed(2));
+    const gst = (totalInterest * gstPercentage) / 100;
+    const totalAmt = parseFloat((E * n + gst).toFixed(2));
 
     setEMI(E);
     setTotalInterestPayable(totalInterest);
@@ -45,7 +53,22 @@ const EMICalculator = () => {
       amortization.push(row);
     }
 
-    setAmortizationSchedule(amortization);
+    setAmortization(amortization);
+
+    calculateGST();
+  };
+
+  const calculateGST = () => {
+    const gst = (totalInterestPayable * gstPercentage) / 100;
+    setGstAmount(gst);
+
+    // Calculate GST amount for each month in the Amortization Schedule
+    const amortizationWithGST = amortization.map((row) => {
+      const gstForMonth = (row.interest * gstPercentage) / 100;
+      return { ...row, gst: gstForMonth };
+    });
+
+    setAmortizationWithGST(amortizationWithGST);
   };
 
   const handleSubmit = (event) => {
@@ -56,10 +79,10 @@ const EMICalculator = () => {
   return (
     <>
       <h2
-        className="mb-4 text-center  text-white"
+        className="mb-4 text-center text-white"
         style={{ background: " #333" }}
       >
-        Emi Calculator
+        EMI Calculator
       </h2>
       <Container className="py-4 border my-3 border-5 rounded">
         <Form onSubmit={handleSubmit}>
@@ -114,8 +137,23 @@ const EMICalculator = () => {
                 />
               </Form.Group>
             </Col>
+            <Col sm={6}>
+              <Form.Group controlId="gstPercentage">
+                <Form.Label className="fw-bold">GST Percentage</Form.Label>
+                <NumericFormat
+                  className="form-control"
+                  suffix={"%"}
+                  required
+                  decimalScale={2}
+                  allowNegative={false}
+                  onValueChange={(values) =>
+                    setGstPercentage(values.floatValue || 0)
+                  }
+                />
+              </Form.Group>
+            </Col>
           </Row>
-          <Button variant="primary" type="submit" className="my-2 ">
+          <Button variant="primary" type="submit" className="my-2">
             Calculate
           </Button>
 
@@ -128,10 +166,14 @@ const EMICalculator = () => {
                 Total Interest Payable: ₹{totalInterestPayable.toFixed(2)}
               </h5>
               <h5>
-                Total Payment <span>(Principal + Interest)</span>: ₹
+                GST Amount ({gstPercentage}%): ₹{gstAmount.toFixed(2)}
+              </h5>
+              <h5>
+                Total Payment <span>(Principal + Interest + GST)</span>: ₹
                 {totalPayment.toFixed(2)}
               </h5>
-              <h3 className="mb-4 text-center  bg-secondary  text-white">
+
+              <h3 className="mb-4 text-center bg-secondary text-white">
                 Amortization Schedule
               </h3>
               <Table striped responsive bordered hover className="mt-4">
@@ -142,18 +184,20 @@ const EMICalculator = () => {
                     <th>EMI</th>
                     <th>Interest</th>
                     <th>Principal</th>
+                    <th>GST</th>
                     <th>Closing Balance</th>
                     <th>Total Interest Paid</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {amortizationSchedule.map((row) => (
+                  {amortizationWithGST.map((row) => (
                     <tr key={row.month}>
                       <td>{row.month}</td>
                       <td>₹{row.openingBalance.toFixed(2)}</td>
                       <td>₹{row.emi.toFixed(2)}</td>
                       <td>₹{row.interest.toFixed(2)}</td>
                       <td>₹{row.principal.toFixed(2)}</td>
+                      <td>₹{row.gst.toFixed(2)}</td>
                       <td>₹{row.closingBalance.toFixed(2)}</td>
                       <td>₹{row.totalInterestPaid.toFixed(2)}</td>
                     </tr>
